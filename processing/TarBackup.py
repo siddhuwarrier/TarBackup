@@ -1,4 +1,4 @@
-#system imports
+#system imports from python library
 from ConfigParser import NoSectionError
 import os
 import errno
