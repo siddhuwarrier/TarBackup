@@ -1,0 +1,18 @@
+Options in the configuration file:
+
+Sections:
+
+[source]
+1. The directories to tar up. (section: directories) - convert to absolute paths. Python List format.
+2. Directories and files to exclude (wildcards acceptable). Python List format.
+
+[destination]
+1. The tar filename
+2. Compression type (default: gz), if empty do not compress.
+
+
+[misc]
+1. Verbose output?
+2. Exclude version control system directories.
+
+

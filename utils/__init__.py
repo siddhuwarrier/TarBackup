@@ -10,3 +10,4 @@
 
 __all__ = ['Exceptions']
 from Exceptions import *
+from TypeChecker import *

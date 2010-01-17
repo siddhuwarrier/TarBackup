@@ -5,43 +5,43 @@ import errno
 import logging.config
 #user-defined imports
 from utils.Exceptions import *
+from utils.TypeChecker import *
 
 #where the config files are stored by default
-TAR_CONFIG_FILE = os.path.join(os.path.expanduser('~'), '.config', 'TarBackup', 'tar-backup.conf')
 LOGGER_CONFIG_FILE = os.path.join(os.path.expanduser('~'), '.config', 'TarBackup', 'logging.conf')
 
-__all__=['TarBackup', 'TAR_CONFIG_FILE', 'LOGGER_CONFIG_FILE'] #to prevent inadvertent imports
+__all__=['TarBackup', 'LOGGER_CONFIG_FILE'] #to prevent inadvertent imports
 
 ## @brief Class for initialising Tar backups.
 # 
 # This class is the starting point for tar backups. It starts up the logger,
-# initialises the configuration file, etc. 
+# initialises the configuration file, etc.
+#
+# @throws FileError Expection thrown when file not found.
+# @throws NoSectionError Exception thrown when logger file corrupt. 
 # @author Siddhu Warrier (siddhuwarrier@gmail.com)
 # @date 10/01/2009
 class TarBackup(object):
-    
     ## @brief The constructor - accepts variable number of arguments.
     #
-    # The constructor starts up the logger, verifies the contents of
-    # the configuration file, etc.
+    # The constructor sets up the params required to get the Tar backup started.
     #
-    # @date 10/01/2009  
-    def __init__(self):
-        
+    #@param[in] sourceDirs (List): List of source directories to be included in the TAR
+    # archive
+    #@param All arguments are keyword arguments
+    #@param[in] destFile (String): The destination file.
+    #@param[in] excludeDirs (List): The list of directories and files (incl wildcards) 
+    # to be excluded.
+    #@param[in] compressionType (String): Supported - gz and bz2
+    #@param[in] miscOptions (Dictionary): Supported keys: verbose, exclude-vcs
+    # @date 10/01/2009
+    @require(validKwargs = ["compressionType", "miscOptions", "excludeDirs"], \
+             sourceDirs = (list,), destFile = (str, ), compressionType = (str,),\
+             miscOptions = (dict, ), excludeDirs = (list, ))
+    def __init__(self, sourceDirs, destFile, **kwargs):
         #by default, unless code modified, it looks in ~/.config for both logger and config files
-
-        #check the config files
-        #1. Config File
-        #if the file does not exist
-        if not os.path.exists(TAR_CONFIG_FILE):
-            raise FileError(errno.ENOENT, "Config File %s does not exist"\
-                            %TAR_CONFIG_FILE)
-        #if the path exists, but the path does not refer to a file
-        if not os.path.isfile(TAR_CONFIG_FILE):
-            raise FileError(errno.EINVAL, "Invalid path to config file: %s"\
-                            %TAR_CONFIG_FILE)
-        
-        #2. Logger file
+        #check config files
+        #1. Logger file
         #if the file does not exist
         if not os.path.exists(LOGGER_CONFIG_FILE):
             raise FileError(errno.ENOENT, "Logger File %s does not exist"\
@@ -51,7 +51,6 @@ class TarBackup(object):
             raise FileError(errno.EINVAL, "Invalid path to logger file: %s"\
                             %LOGGER_CONFIG_FILE)
         
-        #both files are fine
         #set up logging
         try:
             logging.config.fileConfig(LOGGER_CONFIG_FILE)
@@ -59,5 +58,7 @@ class TarBackup(object):
             print noSectionError.args
             raise NoSectionError(LOGGER_CONFIG_FILE)
         
+        
         self.logger = logging.getLogger('TarBackup')
-        self.logger.debug('This is a test message')
+        self.logger.debug("Test")
+        
