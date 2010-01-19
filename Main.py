@@ -36,7 +36,7 @@ LOGGER_TEMPLATE_FILE = os.path.join(os.path.split(sys.argv[0])[0], 'templates', 
 def main():
     #try starting up the program    
     try:
-        TarBackup([], "", compressionType = "gz")
+        TarBackup([], "")
     #file error; does not exist or invalid
     except FileError as (errorcode, strerror): 
         #if the file does not exist, create template config file in the default location
@@ -65,7 +65,7 @@ all of your changes will have been lost. Sorry."
         sys.stderr.write(noSectionError.args[0] + '. Invalid logger config file?')
     #arguments missing
     except NameError as nameError:
-        sys.stderr.write("NameError: %s."%nameError.args[0])
+        sys.stderr.write("NameError: %s"%nameError.args[0])
     except TypeError as typeError:
         sys.stderr.write("TypeError: %s" %typeError.args[0])
 

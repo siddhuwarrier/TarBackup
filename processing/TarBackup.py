@@ -60,5 +60,10 @@ class TarBackup(object):
         
         
         self.logger = logging.getLogger('TarBackup')
-        self.logger.debug("Test")
+        self.logger.debug("Logger set up...")
+        self.logger.debug("Saving arguments...") 
+        self.__dict__.update(kwargs)
+        
+        self.logger.debug("TarBackup constructor set up....")
+        
         
