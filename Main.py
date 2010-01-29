@@ -36,7 +36,7 @@ LOGGER_TEMPLATE_FILE = os.path.join(os.path.split(sys.argv[0])[0], 'templates', 
 def main():
     #try starting up the program    
     try:
-        TarBackup([], "")
+        TarBackup(["~/workspace/personal"], "~/personal_workspace_backup", "~/personal_workspace_backup.snar", compressionType = "gz", excludeDirs = ["~/workspace/personal/Pydocs"])
     #file error; does not exist or invalid
     except FileError as (errorcode, strerror): 
         #if the file does not exist, create template config file in the default location

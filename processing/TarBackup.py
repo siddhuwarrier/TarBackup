@@ -28,17 +28,19 @@ class TarBackup(object):
     #
     #@param[in] sourceDirs (List): List of source directories to be included in the TAR
     # archive
-    #@param All arguments are keyword arguments
     #@param[in] destFile (String): The destination file.
+    #@param[in] incrementalMetaFile (String): The file that stores the incremental backup
+    # information.
+    #@param All arguments that follow are optional keyword arguments
     #@param[in] excludeDirs (List): The list of directories and files (incl wildcards) 
     # to be excluded.
     #@param[in] compressionType (String): Supported - gz and bz2
     #@param[in] miscOptions (Dictionary): Supported keys: verbose, exclude-vcs
     # @date 10/01/2009
     @require(validKwargs = ["compressionType", "miscOptions", "excludeDirs"], \
-             sourceDirs = (list,), destFile = (str, ), compressionType = (str,),\
-             miscOptions = (dict, ), excludeDirs = (list, ))
-    def __init__(self, sourceDirs, destFile, **kwargs):
+             sourceDirs = (list,), destFile = (str, ), incrementalMetaFile = (str, ), 
+             compressionType = (str,),miscOptions = (dict, ), excludeDirs = (list, ))
+    def __init__(self, sourceDirs, destFile, incrementalMetaFile, **kwargs):
         #by default, unless code modified, it looks in ~/.config for both logger and config files
         #check config files
         #1. Logger file
@@ -61,9 +63,42 @@ class TarBackup(object):
         
         self.logger = logging.getLogger('TarBackup')
         self.logger.debug("Logger set up...")
-        self.logger.debug("Saving arguments...") 
+        self.logger.debug("Saving compulsory arguments...")
+        self.sourceDirs = sourceDirs
+        self.destFile = destFile
+        self.incrementalMetaFile = incrementalMetaFile
+        
+        self.logger.debug("Saving keyword arguments...") 
         self.__dict__.update(kwargs)
+        
+        self.logger.debug("Type checking compulsory arguments...")
+        #check the source dir
+        for sourceDir in self.sourceDirs:
+            if not os.path.exists(os.path.expanduser(sourceDir)):
+                raise OSError,(errno.ENONET, "Path %s not found"%sourceDir)
+            #remove the possibly relative path.
+            self.sourceDirs.remove(sourceDir)
+            #add in the equiv abspath
+            self.sourceDirs.append(os.path.abspath(os.path.expanduser(sourceDir)))
+        #check the destfile
+        destDirectory = os.path.split(self.destFile)[0]        
+        if not os.path.exists(os.path.expanduser(destDirectory)):
+            try:
+                os.makedirs(destDirectory)
+            except OSError as osError:
+                raise osError
+        self.destFile = os.path.join(os.path.abspath(os.path.expanduser(destDirectory)),
+                                     os.path.split(self.destFile)[1])
+        
+        self.logger.debug(self.destFile)
+        #check the incrementalMetaFile
+        incrementalMetaDirectory = os.path.split(self.incrementalMetaFile)[0]
+        if not os.path.exists(os.path.expanduser(incrementalMetaDirectory)):
+            try:
+                os.makedirs
+        
+        
         
         self.logger.debug("TarBackup constructor set up....")
         
-        
+ 

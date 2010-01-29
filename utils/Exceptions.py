@@ -25,6 +25,5 @@ class FileError(Exception):
         if errcode not in errorcode.keys():
             raise Exception(errno.EINVAL, "FileError: Invalid Error Code")
         #set the exception args (errno, strerror)
-        self.args = (errcode, "FileError: %s"%strerror)
-        
+        self.args = (errcode, "FileError: %s"%strerror)      
             

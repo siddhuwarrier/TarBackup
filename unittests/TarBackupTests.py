@@ -70,74 +70,12 @@ class ConfigFailureTests(unittest.TestCase):
         else:
             self.fail('Could not create logging.conf file')
             
-class TypeSuccessTests(unittest.TestCase):
-    
-    ## @brief Performs set up operations before test cases are executed.
-    #
-    # This module recreates the logger config file 
-    # @date 18/01/2010    
-    def setUp(self):
-        #recreate the default config file location for other tests      
-        try:  
-            os.makedirs(os.path.split(LOGGER_CONFIG_FILE)[0])
-        except OSError as (errnum, strerror):
-            
-            if errnum == errno.EEXIST:
-                pass
-            else:
-                raise OSError
-        #now copy over both files.
-        ##TODO: If one of the files already exists, it is overwritten. Modify behaviour.
-        shutil.copy(LOGGER_TEMPLATE_FILE, LOGGER_CONFIG_FILE)
-        
-    ## @brief Tests TarBackup if no keyword arguments are provided.
-    #
-    # This test case initialises TarBackup with all of the required arguments
-    # and none of the optional keyword arguments 
-    # @date 18/01/2010
-    def testNoOptionalKeywordArguments(self):
-        try:
-            TarBackup([], "")
-        except Exception as error:
-            self.fail("Exception" + str(error.args) + "raised.")
-    
-    ## @brief Tests TarBackup if only some keyword arguments are specified
-    #
-    # This test case initialises TarBackup with all of the required arguments
-    # and some of the optional arguments.
-    # @date 19/01/2010
-    def testSomeOptionalKeywordArguments(self):
-        try:
-            TarBackup([], "", excludeDirs = [])
-        except Exception as error:
-            self.fail("Exception" + str(error.args) + "raised.")
-    
-    ## @brief Tests TarBackup if only some keyword arguments are specified
-    #
-    # This test case initialises TarBackup with all of the required arguments
-    # and all of the optional arguments.
-    # @date 19/01/2010
-    def testAllOptionalKeywordArguments(self):
-        #"compressionType", "miscOptions", "excludeDirs"
-        try:
-            TarBackup([], "", compressionType = "gz", miscOptions = {"blah":2}, excludeDirs = [])
-        except Exception as error:
-            self.fail("Exception" + str(error.args) + "raised.")        
-    
-    def testCompulsoryArgumentsAsKeywordArguments(self):
-        try:
-            TarBackup(sourceDirs = [], destFile = "", compressionType = "gz", miscOptions = {"blah":2}, excludeDirs = [])
-        except Exception as error:
-            self.fail("Exception" + str(error.args) + "raised.")        
-        
 
-
-def typeSuite():
-    suite = unittest.TestLoader().loadTestsFromTestCase(TypeSuccessTests)
-
+def tarBackupTestSuite():
+    suite = unittest.TestLoader().loadTestsFromTestCase(ConfigFailureTests)
     return suite
 
 
 if __name__ == '__main__':
     runner = unittest.TextTestRunner(sys.stdout, verbosity=2)
-    runner.run(typeSuite())
+    runner.run(tarBackupTestSuite())
