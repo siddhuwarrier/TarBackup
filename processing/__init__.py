@@ -8,6 +8,7 @@
 # @author 1 Alderton Close, Liverpool L26 9SB  
 # @date 10/01/2009
 
-__all__ = ['TarBackup']
+#__all__ = ['TarBackup', 'RECOGNISED_COMPRESSION_TYPES']
 
 from TarBackup import *
+from Constants import *

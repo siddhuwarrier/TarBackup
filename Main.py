@@ -8,8 +8,7 @@
 # TarBackup's sister-module, the yet-to-be-written TarCron, can
 # be used to schedule TarBackup on cron.
 #
-# @author Siddhu Warrier (siddhuwarrier@gmail.com)
-# @author 1 Alderton Close, Liverpool L26 9SB  
+# @author Siddhu Warrier (siddhuwarrier@gmail.com)  
 # @date 10/01/2009
 
 #system imports
@@ -19,9 +18,8 @@ import shutil
 import sys
 import errno
 #user-defined imports
-from utils.Exceptions import *
+from typeutils.Exceptions import * 
 from processing.TarBackup import *
-import optparse
 
 __all__= []
 #global variables.
@@ -36,7 +34,9 @@ LOGGER_TEMPLATE_FILE = os.path.join(os.path.split(sys.argv[0])[0], 'templates', 
 def main():
     #try starting up the program    
     try:
-        TarBackup(["~/workspace/personal"], "~/personal_workspace_backup", "~/personal_workspace_backup.snar", compressionType = "gz", excludeDirs = ["~/workspace/personal/Pydocs"])
+        TarBackup(["~/workspace/personal"], "~/personal_workspace_backup", "~/personal_workspace_backup.snar", 
+                  compressionType = "gz", excludeDirs = ["~/workspace/personal/Pydocs"], 
+                  miscOptions = ["verbos"])
     #file error; does not exist or invalid
     except FileError as (errorcode, strerror): 
         #if the file does not exist, create template config file in the default location
@@ -58,16 +58,18 @@ If any one of them existed previously, they will have been recreated, and \
 all of your changes will have been lost. Sorry."
         else:
             #This is if the path is invalid, or anything else.
-            sys.stderr.write("FileError[%s]: %s"%(errorcode, strerror))
+            print("FileError[%s]: %s"%(errorcode, strerror))
     
     #invalid logging config file
     except NoSectionError as noSectionError:         
-        sys.stderr.write(noSectionError.args[0] + '. Invalid logger config file?')
+        print(noSectionError.args[0] + '. Invalid logger config file?')
     #arguments missing
     except NameError as nameError:
-        sys.stderr.write("NameError: %s"%nameError.args[0])
+        print("NameError: %s"%nameError.args[0])
     except TypeError as typeError:
-        sys.stderr.write("TypeError: %s" %typeError.args[0])
+        print("TypeError: %s" %typeError.args[0])
+    except IllegalArgumentError as illegalArgumentError: 
+        print("IllegalArgumentError: %s" %illegalArgumentError.args[0])
 
 #application execution starts here.
 if __name__ == "__main__":

@@ -4,8 +4,10 @@ import os
 import errno
 import logging.config
 #user-defined imports
-from utils.Exceptions import *
-from utils.TypeChecker import *
+from typeutils.Exceptions import *
+from typeutils.TypeChecker import *
+from processing.Constants import RECOGNISED_COMPRESSION_TYPES,\
+    RECOGNISED_MISC_OPTIONS
 
 #where the config files are stored by default
 LOGGER_CONFIG_FILE = os.path.join(os.path.expanduser('~'), '.config', 'TarBackup', 'logging.conf')
@@ -38,8 +40,8 @@ class TarBackup(object):
     #@param[in] miscOptions (Dictionary): Supported keys: verbose, exclude-vcs
     # @date 10/01/2009
     @require(validKwargs = ["compressionType", "miscOptions", "excludeDirs"], \
-             sourceDirs = (list,), destFile = (str, ), incrementalMetaFile = (str, ), 
-             compressionType = (str,),miscOptions = (dict, ), excludeDirs = (list, ))
+             sourceDirs = list, destFile = str, incrementalMetaFile = str, 
+             compressionType = str,miscOptions = list, excludeDirs = list)
     def __init__(self, sourceDirs, destFile, incrementalMetaFile, **kwargs):
         #by default, unless code modified, it looks in ~/.config for both logger and config files
         #check config files
@@ -95,10 +97,33 @@ class TarBackup(object):
         incrementalMetaDirectory = os.path.split(self.incrementalMetaFile)[0]
         if not os.path.exists(os.path.expanduser(incrementalMetaDirectory)):
             try:
-                os.makedirs
+                os.makedirs(destDirectory)
+            except OSError as osError:
+                raise osError
+        self.incrementalMetaFile = os.path.join(os.path.abspath(
+                                    os.path.expanduser(incrementalMetaDirectory)),
+                                     os.path.split(self.incrementalMetaFile)[1])
+        
+        #typecheck the keyword arguments
+        #@param[in] excludeDirs (List): The list of directories and files (incl wildcards) 
+        # to be excluded.
+        #@param[in] compressionType (String): Supported - gz and bz2
+        #@param[in] miscOptions (Dictionary): Supported keys: verbose, exclude-vcs
+        if "miscOptions" in self.__dict__.keys():
+            for miscOption in self.miscOptions:
+                if miscOption not in RECOGNISED_MISC_OPTIONS:
+                    raise IllegalArgumentError("Invalid misc option " + miscOption +
+                                               ". Valid misc options are: %s"
+                                               %RECOGNISED_MISC_OPTIONS.__str__())
+                            
+        if "compressionType" in self.__dict__.keys():            
+            #check if the compression type is valid.
+            if self.compressionType not in RECOGNISED_COMPRESSION_TYPES:
+                raise IllegalArgumentError("Invalid compression type "  
+                                           + self.compressionType 
+                                           + ". Valid compression types are: %s" 
+                                           %RECOGNISED_COMPRESSION_TYPES.__str__())
         
         
         
-        self.logger.debug("TarBackup constructor set up....")
-        
- 
+        self.logger.debug("TarBackup constructor set up....") 
